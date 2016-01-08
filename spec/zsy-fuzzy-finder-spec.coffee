@@ -10,7 +10,7 @@ PathLoader = require '../lib/path-loader'
 
 describe 'ZsyFuzzyFinder', ->
   [rootDir1, rootDir2] = []
-  [fuzzyFinder, projectView, bufferView, gitStatusView, workspaceElement, fixturesPath] = []
+  [zsyFuzzyFinder, projectView, bufferView, gitStatusView, workspaceElement, fixturesPath] = []
 
   beforeEach ->
     rootDir1 = fs.realpathSync(temp.mkdirSync('root-dir1'))
@@ -39,17 +39,17 @@ describe 'ZsyFuzzyFinder', ->
 
     waitsForPromise ->
       atom.packages.activatePackage('zsy-fuzzy-finder').then (pack) ->
-        fuzzyFinder = pack.mainModule
-        projectView = fuzzyFinder.createProjectView()
-        bufferView = fuzzyFinder.createBufferView()
-        gitStatusView = fuzzyFinder.createGitStatusView()
+        zsyFuzzyFinder = pack.mainModule
+        projectView = zsyFuzzyFinder.createProjectView()
+        bufferView = zsyFuzzyFinder.createBufferView()
+        gitStatusView = zsyFuzzyFinder.createGitStatusView()
 
   dispatchCommand = (command) ->
     atom.commands.dispatch(workspaceElement, "zsy-fuzzy-finder:#{command}")
 
-  waitForPathsToDisplay = (fuzzyFinderView) ->
+  waitForPathsToDisplay = (zsyFuzzyFinderView) ->
     waitsFor "paths to display", 5000, ->
-      fuzzyFinderView.list.children("li").length > 0
+      zsyFuzzyFinderView.list.children("li").length > 0
 
   eachFilePath = (dirPaths, fn) ->
     for dirPath in dirPaths
@@ -586,27 +586,27 @@ describe 'ZsyFuzzyFinder', ->
 
     describe "the initial load paths task started during package activation", ->
       beforeEach ->
-        fuzzyFinder.projectView.destroy()
-        fuzzyFinder.projectView = null
-        fuzzyFinder.startLoadPathsTask()
+        zsyFuzzyFinder.projectView.destroy()
+        zsyFuzzyFinder.projectView = null
+        zsyFuzzyFinder.startLoadPathsTask()
 
         waitsFor ->
-          fuzzyFinder.projectPaths
+          zsyFuzzyFinder.projectPaths
 
       it "passes the indexed paths into the project view when it is created", ->
-        {projectPaths} = fuzzyFinder
+        {projectPaths} = zsyFuzzyFinder
         expect(projectPaths.length).toBe 18
-        projectView = fuzzyFinder.createProjectView()
+        projectView = zsyFuzzyFinder.createProjectView()
         expect(projectView.paths).toBe projectPaths
         expect(projectView.reloadPaths).toBe false
 
       it "busts the cached paths when the project paths change", ->
         atom.project.setPaths([])
 
-        {projectPaths} = fuzzyFinder
+        {projectPaths} = zsyFuzzyFinder
         expect(projectPaths).toBe null
 
-        projectView = fuzzyFinder.createProjectView()
+        projectView = zsyFuzzyFinder.createProjectView()
         expect(projectView.paths).toBe null
         expect(projectView.reloadPaths).toBe true
 
