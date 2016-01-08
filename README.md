@@ -1,6 +1,7 @@
-copy form [atom/fuzzy-finder](https://github.com/atom/fuzzy-finder) for customise function.
+copy form [atom/fuzzyfinder](https://github.com/atom/fuzzy-finder) for customize function.  
 
-# goal
--| open folder and psd link in external app  
--| insert file path  
--| ...
+# goal  
+-| open folder and psd lnk in external app  
+-| insert file path in fuzzyfinder  
+
+

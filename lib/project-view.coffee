@@ -2,22 +2,22 @@
 {Disposable, CompositeDisposable} = require 'atom'
 humanize = require 'humanize-plus'
 
-ZsyFuzzyFinderView = require './zsy-fuzzy-finder-view'
+FuzzyFinderView = require './zsy-fuzzy-finder-view.coffee'
 PathLoader = require './path-loader'
 
 module.exports =
-class ProjectView extends ZsyFuzzyFinderView
+class ProjectView extends FuzzyFinderView
   paths: null
   reloadPaths: true
   reloadAfterFirstLoad: false
 
   initialize: (@paths) ->
     super
-
     @disposables = new CompositeDisposable
     @reloadPaths = false if @paths?.length > 0
 
     windowFocused = =>
+      return
       if @paths?
         @reloadPaths = true
       else
@@ -35,7 +35,7 @@ class ProjectView extends ZsyFuzzyFinderView
       @paths = null
 
   subscribeToConfig: ->
-    @disposables.add atom.config.onDidChange 'zsy-fuzzy-finder.ignoredNames', =>
+    @disposables.add atom.config.onDidChange 'zsy-finder.ignoredNames', =>
       @reloadPaths = true
 
     @disposables.add atom.config.onDidChange 'core.followSymlinks', =>
@@ -76,7 +76,7 @@ class ProjectView extends ZsyFuzzyFinderView
           @reloadAfterFirstLoad = false
         @populate()
 
-      if @paths?
+      if @paths?.length
         @setLoading("Reindexing project\u2026")
       else
         @setLoading("Indexing project\u2026")
