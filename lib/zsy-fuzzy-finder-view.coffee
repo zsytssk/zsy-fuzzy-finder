@@ -18,7 +18,7 @@ class FuzzyFinderView extends SelectListView
   initialize: ->
     super
 
-    @addClass('zsy-finder')
+    @addClass('zsy-fuzzy-finder')
     @setMaxItems(10)
     @subscriptions = new CompositeDisposable
 
@@ -31,19 +31,19 @@ class FuzzyFinderView extends SelectListView
         @splitOpenPath (pane) -> pane.splitDown.bind(pane)
       'pane:split-up': =>
         @splitOpenPath (pane) -> pane.splitUp.bind(pane)
-      'zsy-finder:invert-confirm': =>
+      'zsy-fuzzy-finder:invert-confirm': =>
         @confirmInvertedSelection()
 
-    @alternateScoring = atom.config.get 'zsy-finder.useAlternateScoring'
-    @openExternal = atom.config.get 'zsy-finder.openExternal'
-    @subscriptions.add atom.config.onDidChange 'zsy-finder.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
+    @alternateScoring = atom.config.get 'zsy-fuzzy-finder.useAlternateScoring'
+    @openExternal = atom.config.get 'zsy-fuzzy-finder.openExternal'
+    @subscriptions.add atom.config.onDidChange 'zsy-fuzzy-finder.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
 
 
   getFilterKey: ->
     'projectRelativePath'
 
   cancel: ->
-    if atom.config.get('zsy-finder.preserveLastSearch')
+    if atom.config.get('zsy-fuzzy-finder.preserveLastSearch')
       lastSearch = @getFilterQuery()
       super
 
@@ -198,11 +198,11 @@ class FuzzyFinderView extends SelectListView
 
   confirmSelection: ->
     item = @getSelectedItem()
-    @confirmed(item, searchAllPanes: atom.config.get('zsy-finder.searchAllPanes'))
+    @confirmed(item, searchAllPanes: atom.config.get('zsy-fuzzy-finder.searchAllPanes'))
 
   confirmInvertedSelection: ->
     item = @getSelectedItem()
-    @confirmed(item, searchAllPanes: not atom.config.get('zsy-finder.searchAllPanes'))
+    @confirmed(item, searchAllPanes: not atom.config.get('zsy-fuzzy-finder.searchAllPanes'))
 
   confirmed: ({filePath}={}, openOptions) ->
     if atom.workspace.getActiveTextEditor() and @isQueryALineJump()

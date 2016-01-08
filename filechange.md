@@ -3,7 +3,7 @@
 -| fuzzy-finder:> zsy-fuzzy-finder  
 
 ## 文件修改  
--| zsy-finder-view.coffee  
+-| zsy-fuzzy-finder-view.coffee  
 
 -> change line 8  
 shell = require 'shell'  
