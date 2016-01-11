@@ -94,7 +94,7 @@ module.exports = (rootPaths, followSymlinks, ignoreVcsIgnores, ignores=[]) ->
       ignoredNames.push(new Minimatch(ignore, matchBase: true, dot: true))
     catch error
       console.warn "Error parsing ignore pattern (#{ignore}): #{error.message}"
-
+  console.log rootPaths
   async.each(
     rootPaths,
     (rootPath, next) ->

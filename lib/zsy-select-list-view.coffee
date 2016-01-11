@@ -3,12 +3,11 @@ path = require 'path'
 {$, $$, SelectListView} = require 'atom-space-pen-views'
 {repositoryForPath} = require './helpers'
 fs = require 'fs-plus'
-shell = require 'shell'
 fuzzaldrin = require 'fuzzaldrin'
 fuzzaldrinPlus = require 'fuzzaldrin-plus'
 
 module.exports =
-class FuzzyFinderView extends SelectListView
+class ZsySelectListView extends SelectListView
   filePaths: null
   projectRelativePaths: null
   subscriptions: null
@@ -22,18 +21,6 @@ class FuzzyFinderView extends SelectListView
     @setMaxItems(10)
     @subscriptions = new CompositeDisposable
 
-    atom.commands.add @element,
-      'pane:split-left': =>
-        @splitOpenPath (pane) -> pane.splitLeft.bind(pane)
-      'pane:split-right': =>
-        @splitOpenPath (pane) -> pane.splitRight.bind(pane)
-      'pane:split-down': =>
-        @splitOpenPath (pane) -> pane.splitDown.bind(pane)
-      'pane:split-up': =>
-        @splitOpenPath (pane) -> pane.splitUp.bind(pane)
-      'zsy-fuzzy-finder:invert-confirm': =>
-        @confirmInvertedSelection()
-
     @alternateScoring = atom.config.get 'zsy-fuzzy-finder.useAlternateScoring'
     @openExternal = atom.config.get 'zsy-fuzzy-finder.openExternal'
     @subscriptions.add atom.config.onDidChange 'zsy-fuzzy-finder.useAlternateScoring', ({newValue}) => @alternateScoring = newValue
@@ -43,14 +30,7 @@ class FuzzyFinderView extends SelectListView
     'projectRelativePath'
 
   cancel: ->
-    if atom.config.get('zsy-fuzzy-finder.preserveLastSearch')
-      lastSearch = @getFilterQuery()
-      super
-
-      @filterEditorView.setText(lastSearch)
-      @filterEditorView.getModel().selectAll()
-    else
-      super
+    super
 
   destroy: ->
     @cancel()
@@ -123,35 +103,6 @@ class FuzzyFinderView extends SelectListView
         @div class: "primary-line file icon #{typeClass}", 'data-name': fileBasename, 'data-path': projectRelativePath, -> highlighter(fileBasename, matches, baseOffset)
         @div class: 'secondary-line path no-icon', -> highlighter(projectRelativePath, matches, 0)
 
-  openPath: (filePath, lineNumber, openOptions) ->
-    if filePath
-      atom.workspace.open(filePath, openOptions).then => @moveToLine(lineNumber)
-
-  moveToLine: (lineNumber=-1) ->
-    return unless lineNumber >= 0
-
-    if textEditor = atom.workspace.getActiveTextEditor()
-      position = new Point(lineNumber)
-      textEditor.scrollToBufferPosition(position, center: true)
-      textEditor.setCursorBufferPosition(position)
-      textEditor.moveToFirstCharacterOfLine()
-
-  splitOpenPath: (splitFn) ->
-    {filePath} = @getSelectedItem() ? {}
-    lineNumber = @getLineNumber()
-
-    if @isQueryALineJump() and editor = atom.workspace.getActiveTextEditor()
-      pane = atom.workspace.getActivePane()
-      splitFn(pane)(copyActiveItem: true)
-      @moveToLine(lineNumber)
-    else if not filePath
-      return
-    else if pane = atom.workspace.getActivePane()
-      splitFn(pane)()
-      @openPath(filePath, lineNumber)
-    else
-      @openPath(filePath, lineNumber)
-
   populateList: ->
     if @isQueryALineJump()
       @list.empty()
@@ -204,26 +155,6 @@ class FuzzyFinderView extends SelectListView
     item = @getSelectedItem()
     @confirmed(item, searchAllPanes: not atom.config.get('zsy-fuzzy-finder.searchAllPanes'))
 
-  confirmed: ({filePath}={}, openOptions) ->
-    if atom.workspace.getActiveTextEditor() and @isQueryALineJump()
-      lineNumber = @getLineNumber()
-      @cancel()
-      @moveToLine(lineNumber)
-    else if not filePath
-      @cancel()
-    else if fs.isDirectorySync(filePath)
-      @cancel()
-      shell.openExternal("#{filePath}")
-      # @setError('Selected path is a directory')
-      # setTimeout((=> @setError()), 2000)
-    else if path.extname(filePath) in @openExternal
-      @cancel()
-      shell.openExternal("#{filePath}")
-    else
-      lineNumber = @getLineNumber()
-      @cancel()
-      @openPath(filePath, lineNumber, openOptions)
-
   isQueryALineJump: ->
     query = @filterEditorView.getModel().getText()
     colon = query.indexOf(':')
@@ -239,13 +170,6 @@ class FuzzyFinderView extends SelectListView
     query = query.replace(/\//g, '\\') if process.platform is 'win32'
     query
 
-  getLineNumber: ->
-    query = @filterEditorView.getText()
-    colon = query.indexOf(':')
-    if colon is -1
-      -1
-    else
-      parseInt(query[colon+1..]) - 1
 
   setItems: (filePaths) ->
     super(@projectRelativePathsForFilePaths(filePaths))

@@ -1,12 +1,14 @@
 {$} = require 'atom-space-pen-views'
 {Disposable, CompositeDisposable} = require 'atom'
 humanize = require 'humanize-plus'
+fs = require 'fs-plus'
+shell = require 'shell'
 
-FuzzyFinderView = require './zsy-fuzzy-finder-view.coffee'
+ZsySelectListView = require './zsy-select-list-view.coffee'
 PathLoader = require './path-loader'
 
 module.exports =
-class ProjectView extends FuzzyFinderView
+class ZsyOpenExternalView extends ZsySelectListView
   paths: null
   reloadPaths: true
   reloadAfterFirstLoad: false
@@ -113,6 +115,27 @@ class ProjectView extends FuzzyFinderView
         lastOpenedEditor = editor
 
     lastOpenedEditor?.getPath()
+
+  confirmed: ({filePath}={}, openOptions) ->
+    if atom.workspace.getActiveTextEditor() and @isQueryALineJump()
+      lineNumber = @getLineNumber()
+      @cancel()
+      @moveToLine(lineNumber)
+    else if not filePath
+      @cancel()
+    else if fs.isDirectorySync(filePath)
+      @cancel()
+      shell.openExternal("#{filePath}")
+      # @setError('Selected path is a directory')
+      # setTimeout((=> @setError()), 2000)
+    else if path.extname(filePath) in @openExternal
+      @cancel()
+      shell.openExternal("#{filePath}")
+    else
+      lineNumber = @getLineNumber()
+      @cancel()
+      @openPath(filePath, lineNumber, openOptions)
+
 
   destroy: ->
     @loadPathsTask?.terminate()

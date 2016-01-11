@@ -27,10 +27,6 @@ module.exports =
     atom.commands.add 'atom-workspace',
       'zsy-fuzzy-finder:toggle-file-finder': =>
         @createProjectView().toggle()
-      'zsy-fuzzy-finder:toggle-buffer-finder': =>
-        @createBufferView().toggle()
-      'zsy-fuzzy-finder:toggle-git-status-finder': =>
-        @createGitStatusView().toggle()
 
     process.nextTick => @startLoadPathsTask()
 
@@ -41,9 +37,9 @@ module.exports =
       pane.observeActiveItem (item) -> item?.lastOpened = Date.now()
 
   deactivate: ->
-    if @projectView?
-      @projectView.destroy()
-      @projectView = null
+    if @zsyOpenExternalView?
+      @zsyOpenExternalView.destroy()
+      @zsyOpenExternalView = null
     if @bufferView?
       @bufferView.destroy()
       @bufferView = null
@@ -64,23 +60,11 @@ module.exports =
   createProjectView: ->
     @stopLoadPathsTask()
 
-    unless @projectView?
-      ProjectView  = require './project-view'
-      @projectView = new ProjectView(@projectPaths)
+    unless @zsyOpenExternalView?
+      ZsyOpenExternalView  = require './zsy-open-external-view'
+      @zsyOpenExternalView = new ZsyOpenExternalView(@projectPaths)
       @projectPaths = null
-    @projectView
-
-  createGitStatusView: ->
-    unless @gitStatusView?
-      GitStatusView  = require './git-status-view'
-      @gitStatusView = new GitStatusView()
-    @gitStatusView
-
-  createBufferView: ->
-    unless @bufferView?
-      BufferView = require './buffer-view'
-      @bufferView = new BufferView()
-    @bufferView
+    @zsyOpenExternalView
 
   startLoadPathsTask: ->
     @stopLoadPathsTask()
