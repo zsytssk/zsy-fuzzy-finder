@@ -1,6 +1,6 @@
 {
   "name": "zsy-fuzzy-finder",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "main": "./lib/main",
   "description": "open folder and some file in external app, complete file path in fuzzy-finder",
   "repository": "https://github.com/zsytssk/zsy-fuzzy-finder",
