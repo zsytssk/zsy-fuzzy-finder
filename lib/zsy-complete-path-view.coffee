@@ -109,8 +109,8 @@ class ZsyCompletePathView extends ZsySelectListView
       editor = atom.workspace.getActiveTextEditor()
       curDir = _path.dirname(editor.getPath())
       relativePath = _path.relative(curDir, filePath).replace(/\\/g, '/')
-      if relativePath.indexOf('.') != 0
-        relativePath = './' + relativePath
+      # if relativePath.indexOf('.') != 0
+      #   relativePath = './' + relativePath
       editor.insertText(relativePath)
 
   destroy: ->
