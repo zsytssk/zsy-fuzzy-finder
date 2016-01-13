@@ -10,7 +10,7 @@ PathsChunkSize = 100
 emittedPaths = new Set
 
 class PathLoader
-  constructor: (@rootPath, ignoreVcsIgnores, @traverseSymlinkDirectories, @ignoredNames) ->
+  constructor: (@rootPath, ignoreVcsIgnores, @traverseSymlinkDirectories, @ignoredNames, @includeFolder) ->
     @paths = []
     @realPathCache = {}
     @repo = null
@@ -78,7 +78,8 @@ class PathLoader
           @loadPath(path.join(folderPath, childName), next)
         done
       )
-    @pathLoaded(folderPath, ->)
+    if @includeFolder
+      @pathLoaded(folderPath, ->)
 
   isInternalSymlink: (pathToLoad, done) ->
     fs.realpath pathToLoad, @realPathCache, (err, realPath) =>
@@ -87,7 +88,7 @@ class PathLoader
       else
         done(realPath.search(@rootPath) is 0)
 
-module.exports = (rootPaths, followSymlinks, ignoreVcsIgnores, ignores=[]) ->
+module.exports = (rootPaths, followSymlinks, ignoreVcsIgnores, ignores=[], includeFolder) ->
   ignoredNames = []
   for ignore in ignores when ignore
     try
@@ -101,7 +102,8 @@ module.exports = (rootPaths, followSymlinks, ignoreVcsIgnores, ignores=[]) ->
         rootPath,
         ignoreVcsIgnores,
         followSymlinks,
-        ignoredNames
+        ignoredNames,
+        includeFolder
       ).load(next)
     @async()
   )

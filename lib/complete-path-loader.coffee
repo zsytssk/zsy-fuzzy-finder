@@ -1,4 +1,6 @@
 {Task} = require 'atom'
+_fs = require 'fs-plus'
+_path = require 'path'
 
 module.exports =
   startTask: (callback) ->
@@ -9,12 +11,24 @@ module.exports =
     ignoredNames = ignoredNames.concat(atom.config.get('core.ignoredNames') ? [])
     ignoreVcsIgnores = atom.config.get('core.excludeVcsIgnoredPaths')
 
+    editor = atom.workspace.getActiveTextEditor()
+    proPaths = atom.project.getPaths()
+    for pPath in proPaths
+      if editor.getPath().indexOf(pPath) == -1
+        continue
+      else if editor.getPath().indexOf(pPath) != -1
+        proPath = pPath
+        break
+    if not proPath
+      return
+
     task = Task.once(
       taskPath,
-      atom.project.getPaths(),
+      [proPath],
       followSymlinks,
       ignoreVcsIgnores,
-      ignoredNames, ->
+      ignoredNames,
+      false, ->
         callback(projectPaths)
     )
 
@@ -22,3 +36,5 @@ module.exports =
       projectPaths.push(paths...)
 
     task
+
+

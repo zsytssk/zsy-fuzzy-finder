@@ -1,8 +1,8 @@
 {
   "name": "zsy-fuzzy-finder",
-  "version": "0.95.1",
+  "version": "0.0.0",
   "main": "./lib/main",
-  "description": "copy form atom/fuzzy-finder for customise function.",
+  "description": "open folder and some file in external app, complete file path in fuzzy-finder",
   "repository": "https://github.com/zsytssk/zsy-fuzzy-finder",
   "license": "MIT",
   "dependencies": {

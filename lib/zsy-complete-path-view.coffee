@@ -3,13 +3,12 @@
 humanize = require 'humanize-plus'
 fs = require 'fs-plus'
 shell = require 'shell'
-_path = require 'path'
 
 ZsySelectListView = require './zsy-select-list-view.coffee'
-PathLoader = require './external-path-loader'
+PathLoader = require './complete-path-loader'
 
 module.exports =
-class ZsyOpenExternalView extends ZsySelectListView
+class ZsyCompletePathView extends ZsySelectListView
   paths: null
   reloadPaths: true
   reloadAfterFirstLoad: false
@@ -51,6 +50,18 @@ class ZsyOpenExternalView extends ZsySelectListView
       @reloadPaths = true
 
   toggle: ->
+    editor = atom.workspace.getActiveTextEditor()
+    proPaths = atom.project.getPaths()
+    if not editor.getPath()
+      return event.abortKeyBinding()
+    for pPath in proPaths
+      if editor.getPath().indexOf(pPath) == -1
+        continue
+      else if editor.getPath().indexOf(pPath) != -1
+        proPath = pPath
+        break
+    if not proPath
+      return event.abortKeyBinding()
     if @panel?.isVisible()
       @cancel()
     else
@@ -89,44 +100,18 @@ class ZsyOpenExternalView extends ZsySelectListView
           pathsFound += paths.length
           @loadingBadge.text(humanize.intComma(pathsFound))
 
-  projectRelativePathsForFilePaths: ->
-    projectRelativePaths = super
-
-    if lastOpenedPath = @getLastOpenedPath()
-      for {filePath}, index in projectRelativePaths
-        if filePath is lastOpenedPath
-          [entry] = projectRelativePaths.splice(index, 1)
-          projectRelativePaths.unshift(entry)
-          break
-
-    projectRelativePaths
-
-  getLastOpenedPath: ->
-    activePath = atom.workspace.getActivePaneItem()?.getPath?()
-
-    lastOpenedEditor = null
-
-    for editor in atom.workspace.getTextEditors()
-      filePath = editor.getPath()
-      continue unless filePath
-      continue if activePath is filePath
-
-      lastOpenedEditor ?= editor
-      if editor.lastOpened > lastOpenedEditor.lastOpened
-        lastOpenedEditor = editor
-
-    lastOpenedEditor?.getPath()
-
   confirmed: ({filePath}={}, openOptions) ->
+    _path = require 'path'
     if not filePath
       @cancel()
-    else if fs.isDirectorySync(filePath)
+    else
       @cancel()
-      shell.openExternal("#{filePath}")
-    else if _path.extname(filePath) in @openExternal
-      @cancel()
-      shell.openExternal("#{filePath}")
-
+      editor = atom.workspace.getActiveTextEditor()
+      curDir = _path.dirname(editor.getPath())
+      relativePath = _path.relative(curDir, filePath).replace(/\\/g, '/')
+      if relativePath.indexOf('.') != 0
+        relativePath = './' + relativePath
+      editor.insertText(relativePath)
 
   destroy: ->
     @loadPathsTask?.terminate()

@@ -1,14 +1,25 @@
+-| 现在只能重写load-path-hander了
+
+
 ## 功能  
 # 外部打开  
 -> open-external  
 -> open_external_list  
 
+-> 遍历路劲  
+-> 筛选条件 路径 + open external list  
+-> ...  
+
+
 # 补全路劲  
 -> complete-path  
 -> complete_path_list  
--| 只遍历当前的 project 文件夹  
--> 遍历文件的方法必须能接受参数  
--> folder + psd lnk 这种怎么加进去  
+
+-| 找到当前 project 文件夹  
+-> 遍历所有文件...  
+-> ...  
+
+
 
 ## 难点  
 -| 查找文件  

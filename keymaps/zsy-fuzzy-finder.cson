@@ -1,3 +1,5 @@
 '.atom-workspace':
-  'alt-p': 'zsy-fuzzy-finder:toggle-file-finder'
-  'alt-a': 'zsy-fuzzy-finder:complete-path'
+  'alt-p': 'zsy-fuzzy-finder:open-external'
+
+'atom-text-editor:not([mini])':
+  'alt-a': 'zsy-fuzzy-finder:toggle-complete-path'

@@ -25,8 +25,12 @@ module.exports =
     @active = true
 
     atom.commands.add 'atom-workspace',
-      'zsy-fuzzy-finder:toggle-file-finder': =>
+      'zsy-fuzzy-finder:open-external': =>
         @createProjectView().toggle()
+
+    atom.commands.add 'atom-workspace',
+      'zsy-fuzzy-finder:toggle-complete-path': =>
+        @createCompleteView().toggle()
 
     process.nextTick => @startLoadPathsTask()
 
@@ -40,13 +44,11 @@ module.exports =
     if @zsyOpenExternalView?
       @zsyOpenExternalView.destroy()
       @zsyOpenExternalView = null
-    if @bufferView?
-      @bufferView.destroy()
-      @bufferView = null
-    if @gitStatusView?
-      @gitStatusView.destroy()
-      @gitStatusView = null
+    if @zsyCompletePathView?
+      @zsyCompletePathView.destroy()
+      @zsyCompletePathView = null
     @projectPaths = null
+    @completePaths = null
     @stopLoadPathsTask()
     @active = false
 
@@ -66,13 +68,21 @@ module.exports =
       @projectPaths = null
     @zsyOpenExternalView
 
+  createCompleteView: ->
+    @stopLoadPathsTask()
+    @zsyCompletePathView = null
+    ZsyCompletePathView  = require './zsy-complete-path-view'
+    @zsyCompletePathView = new ZsyCompletePathView(@completePaths)
+    @completePaths = null
+    @zsyCompletePathView
+
   startLoadPathsTask: ->
     @stopLoadPathsTask()
 
     return unless @active
     return if atom.project.getPaths().length is 0
 
-    PathLoader = require './path-loader'
+    PathLoader = require './external-path-loader'
     @loadPathsTask = PathLoader.startTask (@projectPaths) =>
     @projectPathsSubscription = atom.project.onDidChangePaths =>
       @projectPaths = null
