@@ -4,7 +4,6 @@ copy form [atom/fuzzyfinder](https://github.com/atom/fuzzy-finder) for customize
 -| open folder and psd lnk in external app(system default app)  
 -| insert file path form fuzzyfinder  
 
-
 ## default shortcut  
 
 ```coffeescript  
@@ -15,4 +14,4 @@ copy form [atom/fuzzyfinder](https://github.com/atom/fuzzy-finder) for customize
 	'atom-text-editor:not([mini])':  
 		'alt-a': 'zsy-fuzzy-finder:complete-path'  
 
-```
+```  

@@ -1,4 +1,4 @@
--| 现在只能重写load-path-hander了
+-| 现在只能重写load-path-hander了  
 
 
 ## 功能  
@@ -28,7 +28,6 @@
 
 
 ## 附加功能  
--| 复制图片的大小..  
 -| 记录 打开的历史  
 -> atom plugin save cache  
 ---&&---  

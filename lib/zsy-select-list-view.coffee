@@ -82,6 +82,8 @@ class ZsySelectListView extends SelectListView
         ext = path.extname(filePath)
         if fs.isDirectorySync(filePath)
           typeClass = 'icon-file-directory'
+        else if ext == '.lnk'
+          typeClass = 'icon-file-symlink-directory'
         else if fs.isReadmePath(filePath)
           typeClass = 'icon-book'
         else if fs.isCompressedExtension(ext)

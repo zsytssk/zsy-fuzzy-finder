@@ -122,10 +122,10 @@ class ZsyOpenExternalView extends ZsySelectListView
       @cancel()
     else if fs.isDirectorySync(filePath)
       @cancel()
-      shell.openExternal("#{filePath}")
+      shell.showItemInFolder("#{filePath}")
     else if _path.extname(filePath) in @openExternal
       @cancel()
-      shell.openExternal("#{filePath}")
+      shell.openItem("#{filePath}")
 
 
   destroy: ->
